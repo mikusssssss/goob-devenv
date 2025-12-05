@@ -5,14 +5,11 @@
 
 using Content.Shared.Weapons.Ranged.Events;
 using Content.Shared._DV.Weapons.Ranged.Components;
-using Content.Shared.Whitelist;
 
 namespace Content.Shared._DV.Weapons.Ranged.Systems;
 
 public sealed class GunAccuracyModifierSystem : EntitySystem
 {
-    [Dependency] private readonly EntityWhitelistSystem _whitelist = default!;
-
     public override void Initialize()
     {
         base.Initialize();
@@ -22,16 +19,9 @@ public sealed class GunAccuracyModifierSystem : EntitySystem
 
     private void OnGunRefreshModifiers(Entity<PlayerAccuracyModifierComponent> ent, ref GunRefreshModifiersEvent args)
     {
-        if (!_whitelist.CheckBoth(args.Gun, ent.Comp.Blacklist, ent.Comp.Whitelist))
-            return;
-
         var maxSpread = MathHelper.DegreesToRadians(ent.Comp.MaxSpreadAngle);
-        args.MinAngle = Math.Clamp((args.MinAngle + ent.Comp.MinSpreadModifier) * ent.Comp.SpreadMultiplier,
-            0f,
-            maxSpread);
-        args.MaxAngle = Math.Clamp((args.MaxAngle + ent.Comp.MaxSpreadModifier) * ent.Comp.SpreadMultiplier,
-            0f,
-            maxSpread);
+        args.MinAngle = Math.Clamp(args.MinAngle * ent.Comp.SpreadMultiplier, 0f, maxSpread);
+        args.MaxAngle = Math.Clamp(args.MaxAngle * ent.Comp.SpreadMultiplier, 0f, maxSpread);
 
         args.AngleIncrease *= ent.Comp.SpreadMultiplier;
     }

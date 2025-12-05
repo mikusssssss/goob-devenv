@@ -1090,7 +1090,9 @@ public abstract class SharedMeleeWeaponSystem : EntitySystem
     {
         var baseStaminaDamage = TryComp<ShovingComponent>(disarmer, out var shoving) ? shoving.StaminaDamage : ShovingComponent.DefaultStaminaDamage;
 
-        return baseStaminaDamage * _contests.MassContest(disarmer, disarmed);
+        return
+            baseStaminaDamage
+            * _contests.MassContest(disarmer, disarmed, false, 4f);
     }
 
     protected virtual bool DoDisarm(EntityUid user,
